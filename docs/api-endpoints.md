@@ -1,15 +1,19 @@
 # API Endpoints
 
-Base URL: `http://localhost:5000/api`
+Base URL: `http://localhost:4200/api`
 
 ## Auth
 
 - `POST /auth/register`
   - Public
   - Body: `{ name, email, password }`
+  - Password rules: min 8 chars, uppercase, lowercase, number
 - `POST /auth/login`
   - Public
   - Body: `{ email, password }`
+  - Errors:
+    - unknown email -> `404 User not found`
+    - wrong password -> `401 Invalid credentials`
 - `GET /auth/profile`
   - Auth required
 
@@ -25,23 +29,41 @@ Base URL: `http://localhost:5000/api`
 - `GET /documents`
   - Auth required
   - Query: `q`, `tag`, `uploadedBy`, `startDate`, `endDate`, `page`, `limit`
+  - Access scope: owner docs + docs shared to requester email
 - `GET /documents/:id`
-  - Auth required + permission check
+  - Auth required + document access check
+- `GET /documents/:id/view`
+  - Auth required + document access check
+  - Returns inline file stream (used by preview)
+  - Supports `?token=<jwt>` for iframe/img URL-based preview requests
 - `GET /documents/:id/download`
-  - Auth required + permission check
+  - Auth required + document access check
+  - Returns attachment download stream
+  - Supports `?token=<jwt>` for URL-based access
 - `GET /documents/:id/versions`
-  - Auth required + permission check
+  - Auth required + document access check
 - `GET /documents/:id/versions/:version/download`
-  - Auth required + permission check
+  - Auth required + document access check
+  - Returns attachment download stream
 - `POST /documents`
-  - Roles: `admin`, `editor`
-  - `multipart/form-data` fields: `title`, `description`, `tags`, `permissions[]`, `file`
+  - Auth required
+  - `multipart/form-data` fields:
+    - `title` (required)
+    - `description` (optional)
+    - `tags` (comma-separated, optional)
+    - `viewEmails` (comma-separated, optional)
+    - `editEmails` (comma-separated, optional)
+    - `file` (required)
 - `PUT /documents/:id`
-  - Roles: `admin`, `editor` + permission ownership logic
-  - `multipart/form-data` fields: `title`, `description`, `tags`, `permissions[]`, optional `file`
+  - Auth required + edit access check (owner or email in `editEmails`)
+  - `multipart/form-data` fields:
+    - `title`, `description`, `tags` (optional)
+    - `viewEmails`, `editEmails` (owner can change access lists)
+    - `file` (optional)
   - Creates next version on every update
 - `DELETE /documents/:id`
-  - Roles: `admin`, `editor` (owner or admin)
+  - Auth required
+  - Owner only
 
 ## Health
 
