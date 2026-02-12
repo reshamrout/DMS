@@ -36,8 +36,11 @@ if (fs.existsSync(envPath)) {
 }
 
 const config = {
-  apiUrl: normalizeApiUrl(envVars.FRONTEND_API_URL),
+  apiUrl: normalizeApiUrl(
+    process.env.FRONTEND_API_URL || envVars.FRONTEND_API_URL
+  ),
 };
+
 
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 fs.writeFileSync(outputPath, JSON.stringify(config, null, 2) + '\n', 'utf8');
