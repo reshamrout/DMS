@@ -1,0 +1,40 @@
+<div class="card card-soft">
+  <div class="card-body p-4">
+    <h4>Version History</h4>
+
+    <div *ngIf="loading" class="text-muted">Loading versions...</div>
+    <div *ngIf="!loading && !versions.length" class="text-muted">No versions found.</div>
+
+    <div class="table-responsive" *ngIf="versions.length">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Version</th>
+            <th>Title</th>
+            <th>Updated By</th>
+            <th>Updated At</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let version of versions">
+            <td>v{{ version.version }}</td>
+            <td>{{ version.title }}</td>
+            <td>{{ version.updatedBy?.name || 'N/A' }}</td>
+            <td>{{ version.updatedAt | date: 'medium' }}</td>
+            <td>
+              <button
+                class="btn btn-sm btn-outline-primary"
+                type="button"
+                [disabled]="downloadingVersion !== null"
+                (click)="download(version.version, version.originalName)"
+              >
+                {{ downloadingVersion === version.version ? 'Downloading...' : 'Download' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,27 @@
+:root {
+  --brand: #005f73;
+  --brand-dark: #003f4d;
+  --accent: #ee9b00;
+  --bg: #f4f8fb;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: radial-gradient(circle at top right, #d8eff3, var(--bg) 50%);
+}
+
+.page-container {
+  padding: 1.25rem;
+}
+
+.card-soft {
+  border: 0;
+  border-radius: 1rem;
+  box-shadow: 0 10px 24px rgba(20, 45, 63, 0.08);
+}

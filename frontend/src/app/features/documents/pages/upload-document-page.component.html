@@ -1,0 +1,35 @@
+<div class="card card-soft">
+  <div class="card-body p-4">
+    <h4 class="mb-3">Upload Document</h4>
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="mb-3">
+        <label class="form-label">Title</label>
+        <input formControlName="title" class="form-control" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Description</label>
+        <textarea formControlName="description" rows="4" class="form-control"></textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Tags (comma separated)</label>
+        <input formControlName="tags" class="form-control" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Access Emails (comma separated)</label>
+        <input formControlName="accessEmails" class="form-control" placeholder="alice@example.com, bob@example.com" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label d-block">Permissions</label>
+        <div class="d-flex gap-3">
+          <label><input type="checkbox" formControlName="allowView" /> View</label>
+          <label><input type="checkbox" formControlName="allowEdit" /> Edit</label>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">File</label>
+        <input class="form-control" type="file" (change)="onFileChange($event)" />
+      </div>
+      <button class="btn btn-primary" [disabled]="loading" type="submit">{{ loading ? 'Uploading...' : 'Upload' }}</button>
+    </form>
+  </div>
+</div>

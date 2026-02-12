@@ -1,0 +1,52 @@
+<div class="card card-soft mb-4">
+  <div class="card-body">
+    <h4>Documents</h4>
+    <form [formGroup]="filterForm" class="row g-2" (ngSubmit)="fetch(1)">
+      <div class="col-12 col-md-3"><input class="form-control" formControlName="q" placeholder="Search keyword" /></div>
+      <div class="col-12 col-md-2"><input class="form-control" formControlName="tag" placeholder="Tag" /></div>
+      <div class="col-12 col-md-2"><input class="form-control" formControlName="uploadedBy" placeholder="Uploader ID" /></div>
+      <div class="col-6 col-md-2"><input class="form-control" formControlName="startDate" type="date" /></div>
+      <div class="col-6 col-md-2"><input class="form-control" formControlName="endDate" type="date" /></div>
+      <div class="col-12 col-md-1 d-grid"><button class="btn btn-primary" type="submit">Go</button></div>
+      <div class="col-12"><button class="btn btn-link p-0" type="button" (click)="reset()">Reset filters</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="card card-soft">
+  <div class="card-body">
+    <div *ngIf="loading" class="text-muted">Loading documents...</div>
+    <div *ngIf="!loading && !documents.length" class="text-muted">No documents found.</div>
+
+    <div class="table-responsive" *ngIf="!loading && documents.length">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Tags</th>
+            <th>Uploader</th>
+            <th>Version</th>
+            <th>Uploaded</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let doc of documents">
+            <td>{{ doc.title }}</td>
+            <td>{{ doc.tags.join(', ') || '-' }}</td>
+            <td>{{ doc.uploadedBy?.name || 'Unknown' }}</td>
+            <td>v{{ doc.version }}</td>
+            <td>{{ doc.uploadDate | date: 'mediumDate' }}</td>
+            <td><a [routerLink]="['/documents', doc._id]" class="btn btn-sm btn-outline-primary">View</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center" *ngIf="totalPages > 1">
+      <button class="btn btn-outline-secondary btn-sm" [disabled]="page === 1" (click)="fetch(page - 1)">Prev</button>
+      <span>Page {{ page }} / {{ totalPages }}</span>
+      <button class="btn btn-outline-secondary btn-sm" [disabled]="page === totalPages" (click)="fetch(page + 1)">Next</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,28 @@
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: var(--brand)">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" routerLink="/">DMS</a>
+
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#mainNavbar"
+      aria-controls="mainNavbar"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNavbar" *ngIf="authService.currentUser() as user">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" routerLink="/">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" routerLink="/documents">Documents</a></li>
+        <li class="nav-item"><a class="nav-link" routerLink="/documents/upload">Upload</a></li>
+        <li class="nav-item" *ngIf="user.role === 'admin'"><a class="nav-link" routerLink="/admin/users">Users</a></li>
+      </ul>
+      <span class="text-white me-3">{{ user.name }}</span>
+      <button class="btn btn-outline-light btn-sm" (click)="logout()">Logout</button>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,20 @@
+<div class="card card-soft">
+  <div class="card-body p-4">
+    <h2 class="mb-2">Document Management Dashboard</h2>
+    <p class="text-muted mb-4">
+      Securely upload, search, and manage document versions with role-based access control.
+    </p>
+
+    <div class="row g-3">
+      <div class="col-12 col-md-4">
+        <a class="btn btn-outline-primary w-100" routerLink="/documents">Browse Documents</a>
+      </div>
+      <div class="col-12 col-md-4">
+        <a class="btn btn-primary w-100" routerLink="/documents/upload">Upload New Document</a>
+      </div>
+      <div class="col-12 col-md-4" *ngIf="authService.currentUser()?.role === 'admin'">
+        <a class="btn btn-outline-dark w-100" routerLink="/admin/users">Manage Users</a>
+      </div>
+    </div>
+  </div>
+</div>
