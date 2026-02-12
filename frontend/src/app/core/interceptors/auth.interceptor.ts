@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, catchError, throwError } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import { AppConfigService } from '../services/app-config.service';
 import { AuthService } from '../services/auth.service';
 
 @Injectable()
@@ -17,7 +17,8 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private appConfig: AppConfigService
   ) {}
 
   intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
@@ -39,7 +40,7 @@ export class AuthInterceptor implements HttpInterceptor {
         const isBackendApi401 =
           error.status === 401 &&
           typeof error.url === 'string' &&
-          error.url.startsWith(environment.apiUrl);
+          this.isBackendApiUrl(error.url);
 
         if (isBackendApi401 && !isAuthEndpoint) {
           this.authService.logout();
@@ -55,5 +56,20 @@ export class AuthInterceptor implements HttpInterceptor {
         return throwError(() => error);
       })
     );
+  }
+
+  private isBackendApiUrl(url: string): boolean {
+    const base = this.appConfig.apiUrl;
+
+    if (base.startsWith('http://') || base.startsWith('https://')) {
+      return url.startsWith(base);
+    }
+
+    try {
+      const parsed = new URL(url, window.location.origin);
+      return parsed.pathname.startsWith(base);
+    } catch {
+      return url.includes(base);
+    }
   }
 }

@@ -1,6 +1,6 @@
 import {
   AuthService
-} from "./chunk-VZFNT5BW.js";
+} from "./chunk-E3MBM72T.js";
 import {
   AUTO_STYLE,
   AnimationGroupPlayer,
@@ -11,9 +11,11 @@ import {
   sequence,
   style,
   ɵPRE_STYLE
-} from "./chunk-HEXA7CEX.js";
+} from "./chunk-QQW4VEZN.js";
 import {
   ANIMATION_MODULE_TYPE,
+  APP_INITIALIZER,
+  AppConfigService,
   BrowserModule,
   ChangeDetectionScheduler,
   DOCUMENT,
@@ -34,7 +36,6 @@ import {
   __objRest,
   __spreadValues,
   catchError,
-  environment,
   inject,
   map,
   of,
@@ -61,7 +62,7 @@ import {
   ɵɵtemplate,
   ɵɵtext,
   ɵɵtextInterpolate
-} from "./chunk-5LVJLNOS.js";
+} from "./chunk-C6C3ECV3.js";
 
 // node_modules/@angular/animations/fesm2022/browser.mjs
 var LINE_START = "\n - ";
@@ -4218,23 +4219,23 @@ var RoleGuard = class _RoleGuard {
 var routes = [
   {
     path: "auth",
-    loadChildren: () => import("./chunk-MKG55LQQ.js").then((m) => m.AuthModule)
+    loadChildren: () => import("./chunk-VRIXC2KV.js").then((m) => m.AuthModule)
   },
   {
     path: "",
     canActivate: [AuthGuard],
-    loadChildren: () => import("./chunk-7FPO5I4C.js").then((m) => m.DashboardModule)
+    loadChildren: () => import("./chunk-TGOKGDTS.js").then((m) => m.DashboardModule)
   },
   {
     path: "documents",
     canActivate: [AuthGuard],
-    loadChildren: () => import("./chunk-D4BCRWDB.js").then((m) => m.DocumentsModule)
+    loadChildren: () => import("./chunk-7VPTZODF.js").then((m) => m.DocumentsModule)
   },
   {
     path: "admin",
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ["admin"] },
-    loadChildren: () => import("./chunk-SAS6BYA2.js").then((m) => m.AdminModule)
+    loadChildren: () => import("./chunk-ZMYVZITC.js").then((m) => m.AdminModule)
   },
   { path: "**", redirectTo: "" }
 ];
@@ -4355,10 +4356,11 @@ var AppComponent = class _AppComponent {
 
 // src/app/core/interceptors/auth.interceptor.ts
 var AuthInterceptor = class _AuthInterceptor {
-  constructor(authService, router, toastr) {
+  constructor(authService, router, toastr, appConfig) {
     this.authService = authService;
     this.router = router;
     this.toastr = toastr;
+    this.appConfig = appConfig;
   }
   intercept(req, next) {
     const token = this.authService.token();
@@ -4369,7 +4371,7 @@ var AuthInterceptor = class _AuthInterceptor {
     }) : req;
     return next.handle(authReq).pipe(catchError((error) => {
       const isAuthEndpoint = typeof req.url === "string" && (req.url.includes("/auth/login") || req.url.includes("/auth/register"));
-      const isBackendApi401 = error.status === 401 && typeof error.url === "string" && error.url.startsWith(environment.apiUrl);
+      const isBackendApi401 = error.status === 401 && typeof error.url === "string" && this.isBackendApiUrl(error.url);
       if (isBackendApi401 && !isAuthEndpoint) {
         this.authService.logout();
         this.router.navigate(["/auth/login"]);
@@ -4379,9 +4381,21 @@ var AuthInterceptor = class _AuthInterceptor {
       return throwError(() => error);
     }));
   }
+  isBackendApiUrl(url) {
+    const base = this.appConfig.apiUrl;
+    if (base.startsWith("http://") || base.startsWith("https://")) {
+      return url.startsWith(base);
+    }
+    try {
+      const parsed = new URL(url, window.location.origin);
+      return parsed.pathname.startsWith(base);
+    } catch {
+      return url.includes(base);
+    }
+  }
   static {
     this.\u0275fac = function AuthInterceptor_Factory(t) {
-      return new (t || _AuthInterceptor)(\u0275\u0275inject(AuthService), \u0275\u0275inject(Router), \u0275\u0275inject(ToastrService));
+      return new (t || _AuthInterceptor)(\u0275\u0275inject(AuthService), \u0275\u0275inject(Router), \u0275\u0275inject(ToastrService), \u0275\u0275inject(AppConfigService));
     };
   }
   static {
@@ -4390,6 +4404,9 @@ var AuthInterceptor = class _AuthInterceptor {
 };
 
 // src/app/app.module.ts
+function initializeAppConfig(config) {
+  return () => config.load();
+}
 var AppModule = class _AppModule {
   static {
     this.\u0275fac = function AppModule_Factory(t) {
@@ -4401,6 +4418,12 @@ var AppModule = class _AppModule {
   }
   static {
     this.\u0275inj = /* @__PURE__ */ \u0275\u0275defineInjector({ providers: [
+      {
+        provide: APP_INITIALIZER,
+        useFactory: initializeAppConfig,
+        deps: [AppConfigService],
+        multi: true
+      },
       {
         provide: HTTP_INTERCEPTORS,
         useClass: AuthInterceptor,

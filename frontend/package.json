@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "ng": "ng",
+    "prestart": "node scripts/generate-app-config.js",
     "start": "ng serve --port 4300",
+    "prebuild": "node scripts/generate-app-config.js",
     "build": "ng build",
     "test": "ng test"
   },

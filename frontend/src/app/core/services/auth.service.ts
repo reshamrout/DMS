@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { environment } from '../../../environments/environment';
 import { AuthResponse } from '../../models/auth.model';
 import { User, UserRole } from '../../models/user.model';
+import { AppConfigService } from './app-config.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -13,20 +13,24 @@ export class AuthService {
 
   private userSubject = new BehaviorSubject<User | null>(this.getStoredUser());
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private appConfig: AppConfigService
+  ) {
     if (typeof window !== 'undefined') {
       window.addEventListener('storage', this.handleStorageChange);
     }
   }
 
   register(payload: { name: string; email: string; password: string }): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/register`, payload).pipe(
+    return this.http.post<AuthResponse>(`${this.appConfig.apiUrl}/auth/register`, payload).pipe(
       tap((response) => this.persistAuth(response))
     );
   }
 
   login(payload: { email: string; password: string }): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, payload).pipe(
+    return this.http.post<AuthResponse>(`${this.appConfig.apiUrl}/auth/login`, payload).pipe(
       tap((response) => this.persistAuth(response))
     );
   }
@@ -38,7 +42,7 @@ export class AuthService {
   }
 
   refreshProfile(): Observable<{ user: User }> {
-    return this.http.get<{ user: User }>(`${environment.apiUrl}/auth/profile`).pipe(
+    return this.http.get<{ user: User }>(`${this.appConfig.apiUrl}/auth/profile`).pipe(
       tap((res) => {
         this.userSubject.next(res.user);
         localStorage.setItem(this.userKey, JSON.stringify(res.user));
